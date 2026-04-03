@@ -30,7 +30,7 @@ private val LightColors = lightColorScheme(
     background = Gray50,
     onBackground = Gray900,
     surface = Color.White,
-    onSurface = Gray900
+    onSurface = Color.Black,
 )
 
 @Composable

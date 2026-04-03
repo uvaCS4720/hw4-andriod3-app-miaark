@@ -7,6 +7,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,6 +53,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,8 +73,33 @@ class MainActivity : ComponentActivity() {
                 factory = MainViewModelFactory(dao)
             )
             MyApplicationTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainScreen(vm, modifier = Modifier.padding(innerPadding))
+                Scaffold(modifier = Modifier.fillMaxSize().padding(16.dp)) { innerPadding ->
+                    Column(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "UVA Places \uD83D\uDCCD",
+                            color = Color(0xFFFF9800),
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            contentAlignment = Alignment.Center) {
+                            Text(
+                                text = "Explore UVA's placemarks by selecting a place type from the dropdown below",
+                                fontSize = 14.sp,
+                                color = Color.Gray,
+                                fontStyle = FontStyle.Italic
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        MainScreen(vm, modifier = Modifier.fillMaxSize())
+                    }
                 }
             }
         }
@@ -131,27 +161,50 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
 }
 @Composable
 fun MapView(locations: List<LocationEntity>, selectedTag: String){
-    val filtered = locations.filter{
-        it.tags.split(",").contains(selectedTag)
+    val filtered = locations.filter { it.tags.split(",").contains(selectedTag) }
+    var selectedLocation by remember { mutableStateOf<LocationEntity?>(null) }
+
+    val cameraState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(LatLng(38.03567, -78.50365), 15f)
     }
 
-    GoogleMap(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(
-                LatLng(38.03567, -78.50365),
-                15f
-            )
+    Box(modifier = Modifier.fillMaxSize()) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraState
+        ) {
+            filtered.forEach { loc ->
+                Marker(
+                    state = MarkerState(LatLng(loc.latitude, loc.longitude)),
+                    title = loc.name,
+                    onClick = {
+                        selectedLocation = loc
+                        true
+                    }
+                )
+            }
         }
-    ){
-        filtered.forEach{ loc ->
-            Marker(
-                state = MarkerState(
-                    position = LatLng(loc.latitude, loc.longitude)
-                ),
-                title = loc.name,
-                snippet = loc.description.chunked(50).joinToString("\n")
-            )
+
+        // Overlay custom popup outside of GoogleMap scope
+        selectedLocation?.let { loc ->
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 100.dp)
+                    .background(Color.White)
+                    .border(1.dp, Color.Gray)
+                    .padding(8.dp)
+            ) {
+                Column {
+                    Text(loc.name, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(loc.description)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Button(onClick = { selectedLocation = null }) {
+                        Text("Close")
+                    }
+                }
+            }
         }
     }
 }
