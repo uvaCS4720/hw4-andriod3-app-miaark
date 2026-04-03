@@ -134,10 +134,13 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
     var expanded by remember { mutableStateOf(false) }
     var textFieldWidth by remember { mutableStateOf(0) }
 
+    val selectedDisplay = selected.replace("_", " ")
+        .split(" ")
+        .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
 
     Box(modifier = Modifier.padding(16.dp)) {
         OutlinedTextField(
-            value = selected,
+            value = selectedDisplay,
             onValueChange = {},
             readOnly = true,
             label = { Text("Select a Place Type to View") },
@@ -168,7 +171,15 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
         ) {
             tags.forEach { tag ->
                 DropdownMenuItem(
-                    text = { Text(tag) },
+                    text = {
+                        Text(
+                            tag.replace("_", " ")                       // replace underscores with spaces
+                                .split(" ")                              // split into words
+                                .joinToString(" ") { w ->
+                                    w.replaceFirstChar { c -> c.uppercase() }  // capitalize each word
+                                }
+                        )
+                    },
                     onClick = {
                         onSelect(tag)
                         expanded = false
