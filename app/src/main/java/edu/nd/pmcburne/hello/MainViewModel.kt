@@ -40,19 +40,26 @@ class MainViewModel(private val dao: LocationDao) : ViewModel() {
 
     private suspend fun syncData() {
         val existing = dao.getAll()
-        if (existing.isEmpty()) {
-            val apiData = api.getLocations()
-            val entities = apiData.map {
-                LocationEntity(
-                    it.id,
-                    it.name,
-                    it.description,
-                    it.tag_list.joinToString(","),
-                    it.visual_center.latitude,
-                    it.visual_center.longitude
-                )
-            }
-            dao.insertAll(entities)
+
+        val apiData = api.getLocations()
+        val apiEntities = apiData.map {
+            LocationEntity(
+                it.id,
+                it.name,
+                it.description,
+                it.tag_list.joinToString(","),
+                it.visual_center.latitude,
+                it.visual_center.longitude
+            )
+        }
+
+        val toInsertOrUpdate = apiEntities.filter { apiLoc ->
+            val existing = existing.find { it.id == apiLoc.id }
+            existing == null || existing != apiLoc
+        }
+
+        if (toInsertOrUpdate.isNotEmpty()) {
+            dao.insertAll(toInsertOrUpdate)
         }
     }
 }
