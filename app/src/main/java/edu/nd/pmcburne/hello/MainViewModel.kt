@@ -22,6 +22,13 @@ class MainViewModel(private val dao: LocationDao) : ViewModel() {
     private val _locations = MutableStateFlow<List<LocationEntity>>(emptyList())
     val locations: StateFlow<List<LocationEntity>> = _locations
 
+    // --- Add this ---
+    private val _selectedLocation = mutableStateOf<LocationEntity?>(null)
+    val selectedLocation: LocationEntity? get() = _selectedLocation.value
+    fun selectLocation(loc: LocationEntity?) {
+        _selectedLocation.value = loc
+    }
+
     private val api = RetrofitInstance.api
 
     init {

@@ -126,7 +126,7 @@ fun MainScreen(
 
     Column(modifier = modifier.fillMaxSize()) {
         TagDropdown(tags, selectedTag) { vm.setSelectedTag(it) }
-        MapView(locations, selectedTag)
+        MapView(locations, selectedTag, vm)
     }
 }
 
@@ -191,27 +191,28 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
     }
 }
 @Composable
-fun MapView(locations: List<LocationEntity>, selectedTag: String){
+fun MapView(locations: List<LocationEntity>, selectedTag: String, vm: MainViewModel) {
     val originalLatLng = LatLng(38.0336, -78.5080)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(originalLatLng, 17f)
     }
 
     val filtered = locations.filter { it.tags.split(",").contains(selectedTag) }
-    var selectedLocation by remember { mutableStateOf<LocationEntity?>(null) }
+    val selectedLocation = vm.selectedLocation
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
-            modifier = Modifier.fillMaxSize().border(2.dp, color = Color(0xFF232D4B), shape = RoundedCornerShape(8.dp)),
+            modifier = Modifier
+                .fillMaxSize()
+                .border(2.dp, color = Color(0xFF232D4B), shape = RoundedCornerShape(8.dp)),
             cameraPositionState = cameraPositionState
-
         ) {
             filtered.forEach { loc ->
                 Marker(
                     state = MarkerState(LatLng(loc.latitude, loc.longitude)),
                     title = loc.name,
                     onClick = {
-                        selectedLocation = loc
+                        vm.selectLocation(loc)  // <-- use ViewModel
                         true
                     },
                     icon = if (selectedLocation?.id == loc.id) {
@@ -220,9 +221,7 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
                         createSimpleMarker(loc.name, loc.description, Color(0xFFF7922D))
                     }
                 )
-
             }
-
         }
 
         Button(
@@ -241,7 +240,7 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
                 modifier = Modifier
                     .fillMaxSize()
                     .clickable(
-                        onClick = { selectedLocation = null },
+                        onClick = { vm.selectLocation(null) },
                         indication = null,
                         interactionSource = remember { MutableInteractionSource() }
                     )
@@ -262,7 +261,7 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(loc.description)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Button(onClick = { selectedLocation = null }) {
+                    Button(onClick = { vm.selectLocation(null) }) {
                         Text("Close")
                     }
                 }
