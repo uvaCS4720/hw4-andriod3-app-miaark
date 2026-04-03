@@ -63,6 +63,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import androidx.compose.ui.text.font.FontWeight
 
 class MainActivity : ComponentActivity() {
@@ -88,14 +89,15 @@ class MainActivity : ComponentActivity() {
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+
                         Text(
-                            text = "UVA Places \uD83D\uDCCD",
-                            color = Color(0xFFFF9800),
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                                text = "UVA Places \uD83D\uDCCD",
+                                color = Color(0xffE57200),
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.padding(4.dp))
-                        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                        Box(modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 16.dp),
                             contentAlignment = Alignment.Center) {
                             Text(
                                 text = "Explore UVA's placemarks by selecting a place type from the dropdown below",
@@ -196,13 +198,22 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
 
         ) {
             filtered.forEach { loc ->
+                val isSelected = selectedLocation == loc
+
                 Marker(
                     state = MarkerState(LatLng(loc.latitude, loc.longitude)),
                     title = loc.name,
                     onClick = {
                         selectedLocation = loc
                         true
-                    }
+                    },
+                    icon = BitmapDescriptorFactory.defaultMarker(
+                        if (selectedLocation?.id == loc.id) {
+                            BitmapDescriptorFactory.HUE_BLUE
+                        } else {
+                            BitmapDescriptorFactory.HUE_ORANGE
+                        }
+                    )
                 )
             }
         }
