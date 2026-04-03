@@ -90,6 +90,7 @@ class MainActivity : ComponentActivity() {
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold
                         )
+                        Spacer(modifier = Modifier.padding(4.dp))
                         Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                             contentAlignment = Alignment.Center) {
                             Text(
@@ -165,19 +166,19 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
 }
 @Composable
 fun MapView(locations: List<LocationEntity>, selectedTag: String){
+    val originalLatLng = LatLng(38.03567, -78.50365)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(originalLatLng, 15f)
+    }
+
     val filtered = locations.filter { it.tags.split(",").contains(selectedTag) }
     var selectedLocation by remember { mutableStateOf<LocationEntity?>(null) }
 
-    val cameraState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(38.03567, -78.50365), 15f)
-    }
-
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
-            modifier = Modifier.fillMaxSize()
-                .background(Color.White, shape = RoundedCornerShape(8.dp))
-                .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp)),
-            cameraPositionState = cameraState
+            modifier = Modifier.fillMaxSize().border(2.dp, color = Color(0xFF232D4B), shape = RoundedCornerShape(8.dp)),
+            cameraPositionState = cameraPositionState
+
         ) {
             filtered.forEach { loc ->
                 Marker(
@@ -189,6 +190,17 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
                     }
                 )
             }
+        }
+
+        Button(
+            onClick = {
+                cameraPositionState.position = CameraPosition.fromLatLngZoom(originalLatLng, 15f)
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        ) {
+            Text("Reset Position")
         }
 
         selectedLocation?.let { loc ->
@@ -209,7 +221,7 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
                     .widthIn(max = 300.dp)
                     .shadow(elevation = 8.dp, shape = RoundedCornerShape(8.dp))
                     .background(Color.White, shape = RoundedCornerShape(8.dp))
-                    .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                    .border(2.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
                     .padding(8.dp)
             ) {
                 Column {
