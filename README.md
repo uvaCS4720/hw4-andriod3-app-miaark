@@ -7,4 +7,6 @@
 - View placemarks at UVA based on their place tags
 - After selecting a tag from the alphabetically-sorted, scrollable dropdown, the map below populates with all places on grounds that match that place type
 - Map placemarks show the place's name/title and a snippet of a description of that place; clicking on that placemark allows you to see the full description for that place
+- Zoom in and zoom out of the map with the maps + or - widget at the bottom right corner of the map
+- Reset the map its initial position of grounds by clicking the "Reset Position" at the top right corner of the map
 - On start-up, the app pulls from the placemarks API (https://www.cs.virginia.edu/~wxt4gm/placemarks.json), storing any necessary data in the SQLite database. Data is only pulled from the API on start-up, and the rest of your app uses data from the SQLite database. Subsequent runs should only synchronize the data, not re-add it
