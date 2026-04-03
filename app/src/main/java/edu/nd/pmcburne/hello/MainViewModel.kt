@@ -12,7 +12,6 @@ import retrofit2.Retrofit
 
 class MainViewModel(private val dao: LocationDao) : ViewModel() {
 
-    // ------------------- Tag State -------------------
     private val _selectedTag = mutableStateOf("core")
     val selectedTag: String get() = _selectedTag.value
 
@@ -20,7 +19,6 @@ class MainViewModel(private val dao: LocationDao) : ViewModel() {
         _selectedTag.value = tag
     }
 
-    // ------------------- Locations -------------------
     private val _locations = MutableStateFlow<List<LocationEntity>>(emptyList())
     val locations: StateFlow<List<LocationEntity>> = _locations
 
