@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -21,6 +22,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,6 +45,12 @@ import com.google.maps.android.compose.MarkerState
 import com.google.android.gms.maps.model.LatLng
 import edu.nd.pmcburne.hello.ui.theme.MyApplicationTheme
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.runtime.derivedStateOf
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,27 +82,43 @@ fun MainScreen(
     modifier: Modifier = Modifier
 ) {
     val locations by vm.locations.collectAsState()
-    var selectedTag by remember { mutableStateOf("core") }
+    val selectedTag by remember { derivedStateOf { vm.selectedTag } }
     val tags = extractTags(locations)
 
-    Column(modifier = modifier) {
-        TagDropdown(tags, selectedTag){
-            selectedTag = it
-        }
-
+    Column(modifier = modifier.fillMaxSize()) {
+        TagDropdown(tags, selectedTag) { vm.setSelectedTag(it) }
         MapView(locations, selectedTag)
     }
 }
 
 @Composable
-fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit){
+fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
 
-    Box{
-        Text(selected, modifier = Modifier.clickable { expanded = true })
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false})  {
-            tags.forEach{
-                tag -> DropdownMenuItem(
+    Box(modifier = Modifier.padding(16.dp)) { // padding outside the text field
+        OutlinedTextField(
+            value = selected,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Select a Place Type to View") },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = "Dropdown arrow",
+                    modifier = Modifier.clickable { expanded = !expanded }
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded }
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            tags.forEach { tag ->
+                DropdownMenuItem(
                     text = { Text(tag) },
                     onClick = {
                         onSelect(tag)
@@ -105,7 +129,6 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
         }
     }
 }
-
 @Composable
 fun MapView(locations: List<LocationEntity>, selectedTag: String){
     val filtered = locations.filter{
@@ -113,7 +136,7 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
     }
 
     GoogleMap(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(
                 LatLng(38.03567, -78.50365),
@@ -127,7 +150,7 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
                     position = LatLng(loc.latitude, loc.longitude)
                 ),
                 title = loc.name,
-                snippet = loc.description
+                snippet = loc.description.chunked(50).joinToString("\n")
             )
         }
     }
