@@ -12,7 +12,7 @@ val localProperties = Properties().apply{
     load(FileInputStream(rootProject.file("local.properties")))
 }
 android {
-//    useLibrary("org.apache.http.legacy")
+    useLibrary("org.apache.http.legacy")
     kapt {
         arguments {
             arg("room.schemaLocation", "$projectDir/schemas")
@@ -70,6 +70,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.7.0")
     implementation("androidx.room:room-ktx:2.7.0")
     implementation(libs.play.services.maps)
+    implementation(libs.androidx.compose.foundation)
     kapt("androidx.room:room-compiler:2.7.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.maps.android:maps-compose:2.11.4")
