@@ -55,6 +55,7 @@ import androidx.compose.ui.draw.shadow
 import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.compose.ui.graphics.Color.Companion.Black
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
@@ -213,7 +214,11 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
                         selectedLocation = loc
                         true
                     },
-                    icon = createSimpleMarker(loc.name, loc.description)
+                    icon = if (selectedLocation?.id == loc.id) {
+                        createSimpleMarker(loc.name, loc.description, Color(0xFFffb369))
+                    } else {
+                        createSimpleMarker(loc.name, loc.description, Color(0xFFF7922D))
+                    }
                 )
 
             }
@@ -265,7 +270,7 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
         }
     }
 }
-fun createSimpleMarker(title: String, description: String): BitmapDescriptor {
+fun createSimpleMarker(title: String, description: String,  backgroundColor: Color): BitmapDescriptor {
     val textWidthApprox = 18 * maxOf(title.length, 20) // make width big enough for title or snippet
     val width = textWidthApprox + 50
     val height = 135
@@ -275,7 +280,7 @@ fun createSimpleMarker(title: String, description: String): BitmapDescriptor {
     val canvas = Canvas(bitmap)
 
     val fillPaint = Paint().apply {
-        color = 0xfff7922d.toInt()
+        color = backgroundColor.toArgb()
         isAntiAlias = true
     }
 
