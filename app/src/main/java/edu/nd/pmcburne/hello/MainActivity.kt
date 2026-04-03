@@ -1,5 +1,7 @@
 package edu.nd.pmcburne.hello
 
+import android.R.attr.textSize
+import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -50,11 +52,16 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.shadow
+import android.graphics.Canvas
+import android.graphics.Paint
+import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import androidx.compose.ui.text.font.FontWeight
+import com.google.android.gms.maps.model.BitmapDescriptor
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -195,13 +202,7 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
                         selectedLocation = loc
                         true
                     },
-                    icon = BitmapDescriptorFactory.defaultMarker(
-                        if (selectedLocation?.id == loc.id) {
-                            BitmapDescriptorFactory.HUE_BLUE
-                        } else {
-                            BitmapDescriptorFactory.HUE_ORANGE
-                        }
-                    )
+                    icon = createSimpleMarker(loc.name, loc.description)
                 )
 
             }
@@ -253,25 +254,76 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
         }
     }
 }
+fun createSimpleMarker(title: String, description: String): BitmapDescriptor {
+    val textWidthApprox = 18 * maxOf(title.length, 20) // make width big enough for title or snippet
+    val width = textWidthApprox + 50
+    val height = 135
+    val tipHeight = 30
 
-suspend fun syncData(api: ApiService, dao: LocationDao){
-    val existing = dao.getAll()
-    if(existing.isEmpty()){
-        val apiData = api.getLocations()
-        val entities = apiData.map{
-            LocationEntity(
-                it.id,
-                it.name,
-                it.description,
-                it.tag_list.joinToString(","),
-                it.visual_center.latitude,
-                it.visual_center.longitude
-            )
-        }
-        dao.insertAll(entities)
+    val bitmap = Bitmap.createBitmap(width, height + tipHeight, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+
+    val fillPaint = Paint().apply {
+        color = 0xfff7922d.toInt()
+        isAntiAlias = true
     }
-}
 
+    val borderPaint = Paint().apply {
+        color = 0xFFbd5f02.toInt()
+        style = Paint.Style.STROKE
+        strokeWidth = 6f
+        isAntiAlias = true
+    }
+
+    val path = android.graphics.Path().apply {
+        moveTo(0f, 0f)
+        lineTo(width.toFloat(), 0f)
+        lineTo(width.toFloat(), height.toFloat())
+        lineTo(width / 2f + tipHeight / 2f, height.toFloat())
+        lineTo(width / 2f, height + tipHeight.toFloat())
+        lineTo(width / 2f - tipHeight / 2f, height.toFloat())
+        lineTo(0f, height.toFloat())
+        close()
+    }
+
+    canvas.drawPath(path, fillPaint)
+    canvas.drawPath(path, borderPaint)
+
+    val titlePaint = Paint().apply {
+        color = 0xFFFFFFFF.toInt()
+        textSize = 36f
+        textAlign = Paint.Align.CENTER
+        isAntiAlias = true
+        typeface = android.graphics.Typeface.DEFAULT_BOLD
+    }
+
+    val descPaint = Paint().apply {
+        color = 0xFFFFFFFF.toInt()
+        textSize = 24f
+        textAlign = Paint.Align.CENTER
+        isAntiAlias = true
+        typeface = android.graphics.Typeface.create(android.graphics.Typeface.DEFAULT, android.graphics.Typeface.ITALIC)
+    }
+
+    val titleX = width / 2f
+    val titleY = height / 2f - 10f
+    canvas.drawText(title, titleX, titleY, titlePaint)
+
+    val maxChars = 66
+    var snippetText = description.take(maxChars)
+    if (description.length > maxChars) {
+        snippetText = snippetText.dropLast(3) + "..."
+    }
+
+    val lines = snippetText.chunked(33)
+    var yOffset = titleY + 30f
+    for (line in lines) {
+        canvas.drawText(line, width / 2f, yOffset, descPaint)
+        yOffset += descPaint.textSize + 4f
+    }
+
+    return BitmapDescriptorFactory.fromBitmap(bitmap)
+}
 fun extractTags(locations: List<LocationEntity>): List<String>{
     return locations
         .flatMap{ it.tags.split(",") }
