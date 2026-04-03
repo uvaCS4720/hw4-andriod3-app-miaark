@@ -1,3 +1,6 @@
+// SOURCE 1 USED: ChatGPT
+// Usage: Help with syntax of setting up retrofit
+
 package edu.nd.pmcburne.hello
 
 import retrofit2.Retrofit

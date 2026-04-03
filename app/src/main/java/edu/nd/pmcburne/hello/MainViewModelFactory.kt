@@ -1,3 +1,5 @@
+// SOURCE 1 USED: ChatGPT
+// Usage: Help creating MainViewModel, chatgpt suggested creating a factory
 package edu.nd.pmcburne.hello
 
 import androidx.lifecycle.ViewModel

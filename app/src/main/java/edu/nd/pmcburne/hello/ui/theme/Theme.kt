@@ -1,3 +1,6 @@
+// SOURCE 1 USED: ChatGPT
+// Usage: Help choosing correct colors inspired by UVA
+
 package edu.nd.pmcburne.hello.ui.theme
 
 import android.os.Build

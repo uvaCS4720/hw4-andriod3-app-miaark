@@ -1,6 +1,9 @@
+// SOURCE 1 USED: ChatGPT
+// Usage: Clickable markers with text (createSimpleMarker()), dropdown menu item formatting, viewmodel interactions (how to subscribe to values),
+// setting up Google Maps composable and how to use, DB usage setup, UI neatening
+
 package edu.nd.pmcburne.hello
 
-import android.R.attr.textSize
 import android.graphics.Bitmap
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -54,7 +57,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.shadow
 import android.graphics.Canvas
 import android.graphics.Paint
-import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -174,10 +176,10 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
                 DropdownMenuItem(
                     text = {
                         Text(
-                            tag.replace("_", " ")                       // replace underscores with spaces
-                                .split(" ")                              // split into words
+                            tag.replace("_", " ")
+                                .split(" ")
                                 .joinToString(" ") { w ->
-                                    w.replaceFirstChar { c -> c.uppercase() }  // capitalize each word
+                                    w.replaceFirstChar { c -> c.uppercase() }
                                 }
                         )
                     },
@@ -190,6 +192,7 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
         }
     }
 }
+
 @Composable
 fun MapView(locations: List<LocationEntity>, selectedTag: String, vm: MainViewModel) {
     val originalLatLng = LatLng(38.0336, -78.5080)
@@ -212,7 +215,7 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String, vm: MainViewMo
                     state = MarkerState(LatLng(loc.latitude, loc.longitude)),
                     title = loc.name,
                     onClick = {
-                        vm.selectLocation(loc)  // <-- use ViewModel
+                        vm.selectLocation(loc)
                         true
                     },
                     icon = if (selectedLocation?.id == loc.id) {
@@ -269,6 +272,7 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String, vm: MainViewMo
         }
     }
 }
+
 fun createSimpleMarker(title: String, description: String,  backgroundColor: Color): BitmapDescriptor {
     val textWidthApprox = 18 * maxOf(title.length, 20) // make width big enough for title or snippet
     val width = textWidthApprox + 50

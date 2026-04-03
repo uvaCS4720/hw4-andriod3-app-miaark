@@ -1,3 +1,6 @@
+// SOURCE 1 USED: ChatGPT
+// Usage: Help with transforming api to response; mapping, how to include visual_center correctly in response
+
 package edu.nd.pmcburne.hello
 
 data class LocationResponse(

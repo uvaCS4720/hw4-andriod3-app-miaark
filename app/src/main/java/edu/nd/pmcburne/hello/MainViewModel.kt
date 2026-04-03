@@ -1,3 +1,7 @@
+// SOURCE 1 USED: ChatGPT
+// Usage: Help figuring out how to store data for config changes so rotations wouldn't lose data
+// Namely figuring out how to store selections in view model
+// Also help figuring out how to sync data (get new updates if there are changes, but if not don't update) & pull from API in beginning only
 package edu.nd.pmcburne.hello
 
 import androidx.compose.runtime.getValue
@@ -8,7 +12,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import retrofit2.Retrofit
 
 class MainViewModel(private val dao: LocationDao) : ViewModel() {
 
@@ -22,7 +25,6 @@ class MainViewModel(private val dao: LocationDao) : ViewModel() {
     private val _locations = MutableStateFlow<List<LocationEntity>>(emptyList())
     val locations: StateFlow<List<LocationEntity>> = _locations
 
-    // --- Add this ---
     private val _selectedLocation = mutableStateOf<LocationEntity?>(null)
     val selectedLocation: LocationEntity? get() = _selectedLocation.value
     fun selectLocation(loc: LocationEntity?) {
