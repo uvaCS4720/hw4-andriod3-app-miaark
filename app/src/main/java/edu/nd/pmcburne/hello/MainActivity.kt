@@ -182,7 +182,7 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
 fun MapView(locations: List<LocationEntity>, selectedTag: String){
     val originalLatLng = LatLng(38.0336, -78.5080)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(originalLatLng, 15f)
+        position = CameraPosition.fromLatLngZoom(originalLatLng, 17f)
     }
 
     val filtered = locations.filter { it.tags.split(",").contains(selectedTag) }
