@@ -174,7 +174,9 @@ fun MapView(locations: List<LocationEntity>, selectedTag: String){
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize()
+                .background(Color.White, shape = RoundedCornerShape(8.dp))
+                .border(1.dp, Color.Gray, shape = RoundedCornerShape(8.dp)),
             cameraPositionState = cameraState
         ) {
             filtered.forEach { loc ->
