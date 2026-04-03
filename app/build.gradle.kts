@@ -71,6 +71,7 @@ dependencies {
     implementation("androidx.room:room-ktx:2.7.0")
     implementation(libs.play.services.maps)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.ui.unit)
     kapt("androidx.room:room-compiler:2.7.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.maps.android:maps-compose:2.11.4")

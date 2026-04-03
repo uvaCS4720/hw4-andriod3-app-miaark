@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -58,6 +60,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 
@@ -129,8 +133,10 @@ fun MainScreen(
 @Composable
 fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
+    var textFieldWidth by remember { mutableStateOf(0) }
 
-    Box(modifier = Modifier.padding(16.dp)) { // padding outside the text field
+
+    Box(modifier = Modifier.padding(16.dp)) {
         OutlinedTextField(
             value = selected,
             onValueChange = {},
@@ -146,11 +152,20 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = !expanded }
+                .onGloballyPositioned { coordinates ->
+                    textFieldWidth = coordinates.size.width
+                }
         )
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .width(with(LocalDensity.current) { textFieldWidth.toDp() })
+                .heightIn(max=400.dp)
+                .background(Color.White)
+                .padding(top = 10.dp),
+            shadowElevation = 8.dp
         ) {
             tags.forEach { tag ->
                 DropdownMenuItem(
@@ -158,7 +173,7 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
                     onClick = {
                         onSelect(tag)
                         expanded = false
-                    }
+                    },
                 )
             }
         }
@@ -166,7 +181,7 @@ fun TagDropdown(tags: List<String>, selected: String, onSelect: (String) -> Unit
 }
 @Composable
 fun MapView(locations: List<LocationEntity>, selectedTag: String){
-    val originalLatLng = LatLng(38.03567, -78.50365)
+    val originalLatLng = LatLng(38.0336, -78.5080)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(originalLatLng, 15f)
     }

@@ -33,6 +33,8 @@ private val LightColors = lightColorScheme(
     onSurface = Color.Black,
 )
 
+
+
 @Composable
 fun MyApplicationTheme(
     darkTheme: Boolean = false, // could detect system theme
